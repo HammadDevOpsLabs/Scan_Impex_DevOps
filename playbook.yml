@@ -1,0 +1,47 @@
+---
+- name: Provision Laravel Project with Docker and Nginx
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Update CentOS packages
+      ansible.builtin.yum:
+        name: "*"
+        state: latest
+
+    - name: Install Docker
+      ansible.builtin.yum:
+        name: docker
+        state: present
+
+    - name: Install Docker Compose
+      ansible.builtin.get_url:
+        url: https://github.com/docker/compose/releases/download/v2.6.0/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name: Start and enable Docker service
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Copy Dockerfile
+      ansible.builtin.copy:
+        src: ./Dockerfile
+        dest: /opt/laravel/Dockerfile
+
+    - name: Copy docker-compose.yml
+      ansible.builtin.copy:
+        src: ./docker-compose.yml
+        dest: /opt/laravel/docker-compose.yml
+
+    - name: Copy Nginx configuration
+      ansible.builtin.copy:
+        src: ./nginx.conf
+        dest: /opt/laravel/nginx.conf
+
+    - name: Run docker-compose up
+      ansible.builtin.command:
+        cmd: docker-compose up -d
+        chdir: /opt/laravel
