@@ -9,15 +9,38 @@
         name: "*"
         state: latest
 
+    - name: Remove exclude for Docker in dnf.conf
+      ansible.builtin.lineinfile:
+        path: /etc/dnf/dnf.conf
+        regexp: '^exclude=docker\*'
+        state: absent
+
     - name: Remove podman-docker if exists
       ansible.builtin.yum:
         name: podman-docker
         state: absent
       ignore_errors: yes
 
+    - name: Install Docker dependencies
+      ansible.builtin.yum:
+        name:
+          - yum-utils
+          - device-mapper-persistent-data
+          - lvm2
+        state: present
+
+    - name: Set up Docker repository
+      ansible.builtin.command:
+        cmd: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      register: docker_repo_setup
+      changed_when: docker_repo_setup.rc == 0
+
     - name: Install Docker
       ansible.builtin.yum:
-        name: docker
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
         state: present
 
     - name: Install Docker Compose
