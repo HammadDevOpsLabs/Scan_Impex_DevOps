@@ -1,2 +1,2 @@
-192.168.1.168  ansible_user=osboxes ansible_ssh_pass=osboxes.org
-192.168.1.166  ansible_user=osboxes ansible_ssh_pass=osboxes.org
+192.168.1.168 ansible_user=osboxes ansible_ssh_pass=osboxes.org ansible_become_pass=osboxes.org
+192.168.1.166 ansible_user=osboxes ansible_ssh_pass=osboxes.org ansible_become_pass=osboxes.org
