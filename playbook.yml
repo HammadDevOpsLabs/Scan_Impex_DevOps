@@ -9,6 +9,12 @@
         name: "*"
         state: latest
 
+    - name: Remove podman-docker if exists
+      ansible.builtin.yum:
+        name: podman-docker
+        state: absent
+      ignore_errors: yes
+
     - name: Install Docker
       ansible.builtin.yum:
         name: docker
@@ -25,6 +31,12 @@
         name: docker
         state: started
         enabled: true
+
+    - name: Create Laravel directory if not exists
+      ansible.builtin.file:
+        path: /opt/laravel
+        state: directory
+        mode: '0755'
 
     - name: Copy Dockerfile
       ansible.builtin.copy:
@@ -43,5 +55,5 @@
 
     - name: Run docker-compose up
       ansible.builtin.command:
-        cmd: docker-compose up -d
+        cmd: /usr/local/bin/docker-compose up -d
         chdir: /opt/laravel
