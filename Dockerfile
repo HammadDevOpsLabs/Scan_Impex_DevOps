@@ -18,7 +18,7 @@ WORKDIR /var/www/html
 
 # 5. Copy project files
 COPY . .
-COPY .env.example /var/www/html/.env
+
 # 6. Install Composer packages (Update & Install)
 RUN composer update --no-scripts --no-autoloader --ignore-platform-reqs --no-interaction && \
     composer install --no-scripts --no-autoloader --ignore-platform-reqs --no-interaction
