@@ -19,16 +19,19 @@ WORKDIR /var/www/html
 # 5. Copy project files
 COPY . .
 
-# 6. Install Composer packages (Update & Install)
-RUN composer update --no-scripts --no-autoloader --ignore-platform-reqs --no-interaction && \
-    composer install --no-scripts --no-autoloader --ignore-platform-reqs --no-interaction
+# 6. Install Composer packages (Update & Install) if composer.json exists
+RUN if [ -f "composer.json" ]; then \
+        composer install --no-scripts --no-autoloader --ignore-platform-reqs --no-interaction && \
+        composer dump-autoload; \
+    else \
+        echo "composer.json not found. Skipping Composer install."; \
+    fi
 
-# 7. Generate the autoloader and run post-create-project script
-RUN composer dump-autoload && composer run-script post-create-project-cmd
-
-# 8. Set permissions for the web directory
+# 7. Set permissions for the web directory
 RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
-# 9. Expose container ports
+
+# 8. Expose container ports
 EXPOSE 9000
-CMD php artisan migrate --force && php artisan key:generate --force
-CMD ["php-fpm"]
+
+# 9. Run migrations and start PHP-FPM
+CMD php artisan migrate --force && php artisan key:generate --force && php-fpm
