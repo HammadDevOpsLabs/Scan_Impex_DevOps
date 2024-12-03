@@ -12,10 +12,16 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+    libzip-dev \
+    libicu-dev \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl zip pdo_mysql mbstring exif pcntl bcmath gd
 
 # تثبيت Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# إضافة صلاحية آمنة لملف Git
+RUN git config --global --add safe.directory /var/www/html
 
 # نسخ ملفات المشروع
 WORKDIR /var/www/html
